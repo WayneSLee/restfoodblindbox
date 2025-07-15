@@ -1,0 +1,182 @@
+{
+  "project_info": {
+    "project_number": "990427757093",
+    "project_id": "restfoodblindbox",
+    "storage_bucket": "restfoodblindbox.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:990427757093:android:3acf16acad749a016b9dcc",
+        "android_client_info": {
+          "package_name": "com.kuanxing.co.restfood_admin"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "990427757093-l6qftf6r082fffs7445f10clth3avkn4.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBqvF7S3kPbM-F55T1_4ZZso-IE6kbGDpg"
+        },
+        {
+          "current_key": "AIzaSyC_9isufu4tNsrhYgzItUSgR9zWzJJvZsI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "990427757093-l6qftf6r082fffs7445f10clth3avkn4.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "990427757093-2lf3s851n5qjgi96t4lv1sknoj0v5krm.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "kuanxing.co.restfoodadmin.rfbbAdmin"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:990427757093:android:35b5f1cdc6b4207a6b9dcc",
+        "android_client_info": {
+          "package_name": "com.kuanxing.co.restfoodblindbox"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "990427757093-7ovrq9qfedbbdmq7n6t38oqkq3ovv1nv.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.kuanxing.co.restfoodblindbox",
+            "certificate_hash": "d8289fd4be21ae6fd9010fed270229b3892a6f2c"
+          }
+        },
+        {
+          "client_id": "990427757093-l6qftf6r082fffs7445f10clth3avkn4.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBqvF7S3kPbM-F55T1_4ZZso-IE6kbGDpg"
+        },
+        {
+          "current_key": "AIzaSyC_9isufu4tNsrhYgzItUSgR9zWzJJvZsI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "990427757093-l6qftf6r082fffs7445f10clth3avkn4.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "990427757093-2lf3s851n5qjgi96t4lv1sknoj0v5krm.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "kuanxing.co.restfoodadmin.rfbbAdmin"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:990427757093:android:7fb6c15462a0b5986b9dcc",
+        "android_client_info": {
+          "package_name": "com.kuanxing.co.restfoodblindbox.dev"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "990427757093-705ablq3ppmma0qnp0dmo0n608b11j2u.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.kuanxing.co.restfoodblindbox.dev",
+            "certificate_hash": "8f7d3d25c34431c0572f3784466ee329e7ad531e"
+          }
+        },
+        {
+          "client_id": "990427757093-l6qftf6r082fffs7445f10clth3avkn4.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBqvF7S3kPbM-F55T1_4ZZso-IE6kbGDpg"
+        },
+        {
+          "current_key": "AIzaSyC_9isufu4tNsrhYgzItUSgR9zWzJJvZsI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "990427757093-l6qftf6r082fffs7445f10clth3avkn4.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "990427757093-2lf3s851n5qjgi96t4lv1sknoj0v5krm.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "kuanxing.co.restfoodadmin.rfbbAdmin"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:990427757093:android:9a0dc783b2cda3466b9dcc",
+        "android_client_info": {
+          "package_name": "com.kuanxing.co.rfbb_admin"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "990427757093-l6qftf6r082fffs7445f10clth3avkn4.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBqvF7S3kPbM-F55T1_4ZZso-IE6kbGDpg"
+        },
+        {
+          "current_key": "AIzaSyC_9isufu4tNsrhYgzItUSgR9zWzJJvZsI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "990427757093-l6qftf6r082fffs7445f10clth3avkn4.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "990427757093-2lf3s851n5qjgi96t4lv1sknoj0v5krm.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "kuanxing.co.restfoodadmin.rfbbAdmin"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,0 +1,30 @@
+[
+  {
+    "id": 1,
+    "name": "脆瓜",
+    "price": 90,
+    "description": "經典醃製手法，開胃首選",
+    "imageUrl": "https://scontent.ftpe8-1.fna.fbcdn.net/v/t39.30808-6/508265627_24361860213407127_8491526613261791806_n.jpg?_nc_cat=108&ccb=1-7&_nc_sid=833d8c&_nc_ohc=48hn2Kys5O4Q7kNvwElYo9K&_nc_oc=Admtm-kWJ5wHPtUcHXyXT0DkJkB8gWZWIBvXq6_sR4zVfVx0Zq1kn0RkhPkaSuX1ilA&_nc_zt=23&_nc_ht=scontent.ftpe8-1.fna&_nc_gid=0JKSQb1Xbke_xYrkS5ijqQ&oh=00_AfOWZjTX5B0ta6yoxdEp1ehbnaJccwJRPOpN2es8afBi1Q&oe=685C7740"
+  },
+  {
+    "id": 2,
+    "name": "蔥花蛋",
+    "price": 30,
+    "description": "蔥香四溢，焦脆口感",
+    "imageUrl": "https://scontent.ftpe8-3.fna.fbcdn.net/v/t39.30808-6/506727065_24338841189042363_4798987972250056627_n.jpg?_nc_cat=106&ccb=1-7&_nc_sid=833d8c&_nc_ohc=1F0pO6rMg0YQ7kNvwFygs3t&_nc_oc=AdknKlqtbsVMw7kJoxcaS0v6sdhBGbs825ohEGHaz5cx1jMJ8-kEUxJCIblEhPnw69M&_nc_zt=23&_nc_ht=scontent.ftpe8-3.fna&_nc_gid=gwWTRLbdCeMM2Q_FvQBzRQ&oh=00_AfNa8Esr9UaPx0JJhxfMBf7qxAysUU6zg1HR3qBH_OXiEg&oe=685C4E06"
+  },
+  {
+    "id": 3,
+    "name": "炒高麗菜",
+    "price": 70,
+    "description": "清甜爽脆，家常好滋味",
+    "imageUrl": "https://tokyo-kitchen.icook.network/uploads/recipe/cover/116990/96a6e21655026279.jpg"
+  },
+  {
+    "id": 4,
+    "name": "麻婆豆腐",
+    "price": 120,
+    "description": "香麻帶勁，白飯殺手",
+    "imageUrl": "https://d3l76hx23vw40a.cloudfront.net/recipe/gy20-052d.jpg"
+  }
+]
