@@ -1,9 +1,11 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:restfoodblindbox/bloc/cart/cart_bloc.dart';
 import 'package:restfoodblindbox/bloc/cart/cart_event.dart';
 import 'package:restfoodblindbox/models/product_model.dart';
+import 'package:restfoodblindbox/widgets/login_prompt_dialog.dart';
 
 final formatter =
 NumberFormat.currency(locale: 'zh_TW', symbol: 'NT\$', decimalDigits: 0);
@@ -137,15 +139,21 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                 onPressed: isSoldOut
                     ? null
                     : () {
-                  context.read<CartBloc>().add(CartItemAdded(
-                      widget.product, widget.storeId,
-                      quantity: _quantity));
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                        content: Text('已加入購物車'),
-                        duration: Duration(seconds: 1)),
-                  );
-                  Navigator.of(context).pop();
+                  // 3. 同樣檢查使用者是否已登入
+                  if (FirebaseAuth.instance.currentUser == null) {
+                    showLoginPromptDialog(context);
+                  } else {
+                    // 已登入才執行加入購物車邏輯
+                    context.read<CartBloc>().add(CartItemAdded(
+                        widget.product, widget.storeId,
+                        quantity: _quantity));
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                          content: Text('已加入購物車'),
+                          duration: Duration(seconds: 1)),
+                    );
+                    Navigator.of(context).pop();
+                  }
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: isSoldOut ? Colors.grey : Colors.deepPurple,

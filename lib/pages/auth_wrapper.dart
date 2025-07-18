@@ -3,10 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:restfoodblindbox/models/user_profile_model.dart';
 import 'package:restfoodblindbox/pages/login_page.dart';
 import 'package:restfoodblindbox/pages/main_page.dart';
-import 'package:restfoodblindbox/pages/role_selection_page.dart'; // 1. 引入身份選擇頁
+import 'package:restfoodblindbox/pages/role_selection_page.dart';
 import 'package:restfoodblindbox/pages/store_dashboard_page.dart';
-import 'package:restfoodblindbox/services/api_exceptions.dart'; // 2. 引入 Exception 檔案
+import 'package:restfoodblindbox/services/api_exceptions.dart';
 import 'package:restfoodblindbox/services/api_service.dart';
+import 'package:restfoodblindbox/widgets/custom_loading_indicator.dart';
 
 class AuthWrapper extends StatelessWidget {
   const AuthWrapper({super.key});
@@ -16,26 +17,29 @@ class AuthWrapper extends StatelessWidget {
     return StreamBuilder<User?>(
       stream: FirebaseAuth.instance.authStateChanges(),
       builder: (context, authSnapshot) {
+        // 狀態一：正在驗證使用者登入狀態
         if (authSnapshot.connectionState == ConnectionState.waiting) {
-          return const Scaffold(body: Center(child: CircularProgressIndicator()));
+          return const Scaffold(body: CustomLoadingIndicator());
         }
 
+        // --- vvv 這是本次修改的核心 vvv ---
+        // 狀態二：使用者已登入
         if (authSnapshot.hasData) {
+          // 如果已登入，就和以前一樣，去後端獲取使用者角色資料
           return FutureBuilder<UserProfile>(
             future: ApiService.fetchUserProfile(),
             builder: (context, profileSnapshot) {
               if (profileSnapshot.connectionState == ConnectionState.waiting) {
-                return const Scaffold(body: Center(child: CircularProgressIndicator()));
+                return const Scaffold(body: CustomLoadingIndicator());
               }
 
               if (profileSnapshot.hasError) {
                 final error = profileSnapshot.error;
-                // 3. 檢查錯誤的類型
                 if (error is UserNotFoundInApiException) {
-                  // 如果是找不到使用者，代表是新用戶，導向到身份選擇頁
+                  // 新註冊的使用者，導向到身份選擇頁
                   return const RoleSelectionPage();
                 } else {
-                  // 如果是其他錯誤，才顯示錯誤畫面
+                  // 其他錯誤，顯示錯誤畫面
                   return Scaffold(
                     body: Center(child: Text('無法載入使用者資訊: $error')),
                   );
@@ -43,9 +47,8 @@ class AuthWrapper extends StatelessWidget {
               }
 
               if (profileSnapshot.hasData) {
-                // ... (根據角色導航的邏輯不變) ...
+                // 根據角色，導向到店家後台或消費者主頁
                 final userProfile = profileSnapshot.data!;
-
                 if (userProfile.role == 'store' && userProfile.storeId != null) {
                   return StoreDashboardPage(storeId: userProfile.storeId!);
                 } else {
@@ -53,12 +56,16 @@ class AuthWrapper extends StatelessWidget {
                 }
               }
 
-              return const LoginPage();
+              // 預防萬一，如果 FutureBuilder 沒資料但 Auth 有，先顯示載入中
+              return const Scaffold(body: CustomLoadingIndicator());
             },
           );
         } else {
-          return const LoginPage();
+          // 狀態三：使用者未登入 (訪客模式)
+          // 直接讓使用者進入主頁面！
+          return const MainPage();
         }
+        // --- ^^^ 修改到此結束 ^^^ ---
       },
     );
   }

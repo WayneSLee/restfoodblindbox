@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart'; // 1. 引入 flutter_bloc
 import 'package:intl/intl.dart';
@@ -5,6 +6,7 @@ import 'package:restfoodblindbox/bloc/cart/cart_bloc.dart'; // 2. 引入 CartBlo
 import 'package:restfoodblindbox/bloc/cart/cart_event.dart'; // 3. 引入 CartEvent
 import 'package:restfoodblindbox/models/product_model.dart';
 import 'package:restfoodblindbox/pages/product_detail.dart';
+import 'package:restfoodblindbox/widgets/login_prompt_dialog.dart';
 
 // 貨幣格式化工具
 final formatter =
@@ -89,18 +91,22 @@ class ProductCard extends StatelessWidget {
                       IconButton(
                         icon: const Icon(Icons.add_shopping_cart),
                         onPressed: () {
-                          // 4. 使用 context.read 來找到 CartBloc，並發送事件
-                          context
-                              .read<CartBloc>()
-                              .add(CartItemAdded(product, storeId));
+                          if (FirebaseAuth.instance.currentUser == null) {
+                            // 如果是 null (訪客)，就顯示提示登入的對話框
+                            showLoginPromptDialog(context);
+                          } else {
+                            // 如果不是 null (已登入)，才執行原本的加入購物車邏輯
+                            context
+                                .read<CartBloc>()
+                                .add(CartItemAdded(product, storeId));
 
-                          // 5. 顯示一個提示訊息，告知使用者已成功加入
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('已加入購物車！'),
-                              duration: Duration(seconds: 1),
-                            ),
-                          );
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('已加入購物車！'),
+                                duration: Duration(seconds: 1),
+                              ),
+                            );
+                          }
                         },
                         tooltip: '加入購物車',
                       ),

@@ -89,6 +89,13 @@ exports.sendChatNotification = onDocumentCreated("chats/{orderId}/messages/{mess
                 type: "chat_message",
                 orderId: orderId,
             },
+            apns: { // 專門為背景/終止狀態的 iOS 加入音效
+                payload: {
+                    aps: {
+                        sound: "default",
+                    },
+                },
+            },
         },
     };
 

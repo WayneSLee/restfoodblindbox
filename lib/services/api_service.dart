@@ -469,4 +469,33 @@ class ApiService {
       throw Exception('刪除帳號失敗: ${response.body}');
     }
   }
+
+  static Future<String> signInWithApple({
+    required String identityToken,
+    String? fullName,
+    String? email,
+  }) async {
+    final response = await http.post(
+      Uri.parse('$_baseUrl/auth/apple'), // 這是我們在後端規格中定義的端點
+      headers: {'Content-Type': 'application/json; charset=UTF-8'},
+      body: jsonEncode({
+        'identityToken': identityToken,
+        'fullName': fullName,
+        'email': email,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      // 預期後端會回傳一個 JSON，裡面包含 Firebase Custom Token
+      final responseBody = jsonDecode(response.body);
+      final String? customToken = responseBody['customToken'];
+      if (customToken != null) {
+        return customToken;
+      } else {
+        throw Exception("後端回應中找不到 Custom Token");
+      }
+    } else {
+      throw Exception('Apple 登入後端驗證失敗: ${response.body}');
+    }
+  }
 }

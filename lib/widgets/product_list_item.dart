@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart'; // 1. 引入 Firebase Auth
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
@@ -5,6 +6,7 @@ import 'package:restfoodblindbox/bloc/cart/cart_bloc.dart';
 import 'package:restfoodblindbox/bloc/cart/cart_event.dart';
 import 'package:restfoodblindbox/models/product_model.dart';
 import 'package:restfoodblindbox/pages/product_detail.dart';
+import 'package:restfoodblindbox/widgets/login_prompt_dialog.dart'; // 2. 引入我們建立的對話框
 
 // 貨幣格式化工具
 final formatter =
@@ -23,12 +25,10 @@ class ProductListItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bool isSoldOut = product.quantity <= 0;
-    // --- vvv 這是本次新增的邏輯 vvv ---
     final bool hasPickupTime = product.pickupStartTime != null &&
         product.pickupEndTime != null &&
         product.pickupStartTime!.isNotEmpty &&
         product.pickupEndTime!.isNotEmpty;
-    // --- ^^^ 新增到此結束 ^^^ ---
 
     return Card(
       elevation: 2,
@@ -80,7 +80,6 @@ class ProductListItem extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                     ),
                     const SizedBox(height: 4),
-                    // --- vvv 這是本次新增的 UI vvv ---
                     if (hasPickupTime)
                       Padding(
                         padding: const EdgeInsets.only(top: 4.0),
@@ -96,7 +95,6 @@ class ProductListItem extends StatelessWidget {
                           ],
                         ),
                       ),
-                    // --- ^^^ 新增到此結束 ^^^ ---
                     const SizedBox(height: 4),
                     Text(
                       isSoldOut ? '已售完' : '剩餘: ${product.quantity}',
@@ -120,17 +118,27 @@ class ProductListItem extends StatelessWidget {
                         ),
                         IconButton(
                           icon: const Icon(Icons.add_shopping_cart),
-                          onPressed: isSoldOut ? null : () {
-                            context
-                                .read<CartBloc>()
-                                .add(CartItemAdded(product, storeId));
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text('已加入購物車！'),
-                                duration: Duration(seconds: 1),
-                              ),
-                            );
+                          // --- vvv 這是本次修改的核心 vvv ---
+                          onPressed: isSoldOut
+                              ? null
+                              : () {
+                            // 3. 檢查使用者是否已登入
+                            if (FirebaseAuth.instance.currentUser == null) {
+                              showLoginPromptDialog(context);
+                            } else {
+                              // 已登入才執行加入購物車
+                              context.read<CartBloc>().add(
+                                  CartItemAdded(product, storeId));
+                              ScaffoldMessenger.of(context)
+                                  .showSnackBar(
+                                const SnackBar(
+                                  content: Text('已加入購物車！'),
+                                  duration: Duration(seconds: 1),
+                                ),
+                              );
+                            }
                           },
+                          // --- ^^^ 修改到此結束 ^^^ ---
                           tooltip: '加入購物車',
                         ),
                       ],

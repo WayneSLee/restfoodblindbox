@@ -1,10 +1,10 @@
+import 'dart:io'; // 引入 dart:io 來判斷平台
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-// 我們不再需要手動導航到 MainPage，所以可以移除這個引用
-// import 'package:restfoodblindbox/pages/main_page.dart';
 import 'package:restfoodblindbox/pages/register_page.dart';
-import 'package:restfoodblindbox/pages/role_selection_page.dart';
+import 'package:restfoodblindbox/services/api_service.dart';
+import 'package:sign_in_with_apple/sign_in_with_apple.dart'; // 引入新套件
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -20,7 +20,13 @@ class _LoginPageState extends State<LoginPage> {
 
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
-  // 傳統 Email/密碼登入
+  Future<void> _handleSuccessfulLogin() async {
+    if (mounted && Navigator.canPop(context)) {
+      Navigator.of(context).pop(true);
+    }
+    // 如果不能 pop，AuthWrapper 會處理後續跳轉
+  }
+
   Future<void> _submitLogin() async {
     setState(() => _isLoading = true);
     try {
@@ -28,18 +34,8 @@ class _LoginPageState extends State<LoginPage> {
         email: _emailController.text.trim(),
         password: _passwordController.text.trim(),
       );
-      // --- vvv 這是本次修改的核心 vvv ---
-      // 登入成功後，我們不再手動導航。
-      // AuthWrapper 會自動監聽到 Auth 狀態變化並處理後續導航。
-      // if (mounted) {
-      //   Navigator.pushReplacement(
-      //     context,
-      //     MaterialPageRoute(builder: (_) => const MainPage()),
-      //   );
-      // }
-      // --- ^^^ 修改到此結束 ^^^ ---
+      await _handleSuccessfulLogin();
     } on FirebaseAuthException catch (e) {
-      // 登入失敗時，顯示錯誤訊息
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(e.message ?? '登入失敗')),
@@ -52,14 +48,11 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
-  // Google 登入邏輯
   Future<void> _signInWithGoogle() async {
     setState(() => _isLoading = true);
     try {
       final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
-
       if (googleUser == null) {
-        // 使用者取消了 Google 登入
         if (mounted) setState(() => _isLoading = false);
         return;
       }
@@ -74,25 +67,16 @@ class _LoginPageState extends State<LoginPage> {
       final UserCredential userCredential =
       await _auth.signInWithCredential(credential);
 
-      // --- vvv 這是本次修改的核心 vvv ---
-      final bool isNewUser = userCredential.additionalUserInfo?.isNewUser ?? false;
+      final bool isNewUser =
+          userCredential.additionalUserInfo?.isNewUser ?? false;
 
-      // 對於新用戶，我們仍然需要導向到身份選擇頁，因為 AuthWrapper 無法判斷新用戶該去哪
-      if (isNewUser && mounted) {
-        Navigator.of(context).pushAndRemoveUntil(
-          MaterialPageRoute(builder: (context) => const RoleSelectionPage()),
-              (route) => false,
-        );
+      // 如果是新註冊的使用者，需要先去後端建立資料
+      // 注意：Google 登入預設為 consumer 身份
+      if (isNewUser) {
+        await ApiService.createUserProfile(role: 'consumer');
       }
-      // 對於舊用戶，我們同樣不再手動導航，交給 AuthWrapper 處理
-      // else if (mounted) {
-      //   Navigator.of(context).pushAndRemoveUntil(
-      //     MaterialPageRoute(builder: (context) => const MainPage()),
-      //     (route) => false,
-      //   );
-      // }
-      // --- ^^^ 修改到此結束 ^^^ ---
 
+      await _handleSuccessfulLogin();
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -106,6 +90,46 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
+  // --- vvv 這是新增的 Apple 登入方法 vvv ---
+  Future<void> _signInWithApple() async {
+    setState(() => _isLoading = true);
+    try {
+      // 1. 向 Apple 請求使用者授權
+      final credential = await SignInWithApple.getAppleIDCredential(
+        scopes: [
+          AppleIDAuthorizationScopes.email,
+          AppleIDAuthorizationScopes.fullName,
+        ],
+      );
+
+      // 2. 將從 Apple 取得的資訊，傳送到您的後端 API
+      //    後端會負責驗證並建立/登入使用者，然後回傳 Firebase Custom Token
+      final String customToken = await ApiService.signInWithApple(
+          identityToken: credential.identityToken!,
+          fullName: (credential.givenName ?? '') + (credential.familyName ?? ''),
+          email: credential.email
+      );
+
+      // 3. 使用後端回傳的 Custom Token 登入 Firebase
+      await _auth.signInWithCustomToken(customToken);
+
+      // 4. 執行前端的成功登入流程
+      await _handleSuccessfulLogin();
+
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Apple 登入失敗: $e')),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
+  }
+  // --- ^^^ 新增到此結束 ^^^ ---
+
   @override
   void dispose() {
     _emailController.dispose();
@@ -115,7 +139,6 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    // ... UI 部分維持不變 ...
     return Scaffold(
       appBar: AppBar(title: const Text('登入')),
       body: Center(
@@ -131,6 +154,7 @@ class _LoginPageState extends State<LoginPage> {
                 controller: _emailController,
                 decoration: const InputDecoration(
                     labelText: 'Email', border: OutlineInputBorder()),
+                keyboardType: TextInputType.emailAddress,
               ),
               const SizedBox(height: 16),
               TextField(
@@ -144,8 +168,11 @@ class _LoginPageState extends State<LoginPage> {
                 const CircularProgressIndicator()
               else
                 Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 12)),
                       onPressed: _submitLogin,
                       child: const Text('登入'),
                     ),
@@ -155,21 +182,32 @@ class _LoginPageState extends State<LoginPage> {
                       label: const Text('使用 Google 登入'),
                       onPressed: _signInWithGoogle,
                       style: ElevatedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 8),
                         backgroundColor: Colors.white,
-                        foregroundColor: Colors.black,
+                        foregroundColor: Colors.black87,
                       ),
                     ),
-                    TextButton(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (_) => const RegisterPage()),
-                        );
-                      },
-                      child: const Text('還沒有帳號？點我註冊'),
-                    ),
+                    // --- vvv 這是新增的 Apple 登入按鈕 vvv ---
+                    // 只在 iOS 平台上顯示 Apple 登入按鈕
+                    if (Platform.isIOS) ...[
+                      const SizedBox(height: 12),
+                      SignInWithAppleButton(
+                        onPressed: _signInWithApple,
+                        style: SignInWithAppleButtonStyle.black, // 可選 black, white, whiteOutlined
+                      ),
+                    ],
+                    // --- ^^^ 新增到此結束 ^^^ ---
                   ],
                 ),
+              TextButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const RegisterPage()),
+                  );
+                },
+                child: const Text('還沒有帳號？點我註冊'),
+              ),
             ],
           ),
         ),

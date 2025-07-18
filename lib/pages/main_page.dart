@@ -1,4 +1,5 @@
 import 'package:badges/badges.dart' as badges;
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
@@ -11,6 +12,7 @@ import 'package:restfoodblindbox/pages/profile_page.dart';
 import 'package:restfoodblindbox/pages/store_list_page.dart';
 import 'package:restfoodblindbox/services/fcm_service.dart';
 import 'package:restfoodblindbox/services/notification_service.dart';
+import 'package:restfoodblindbox/widgets/login_prompt_dialog.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:showcaseview/showcaseview.dart';
 
@@ -19,16 +21,12 @@ class MainPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // --- vvv 這是本次的修正 vvv ---
-    // 修正 ShowCaseWidget 的 builder 寫法，移除多餘的 Builder()
     return ShowCaseWidget(
       builder: (context) => const _MainPageView(),
     );
-    // --- ^^^ 修正到此結束 ^^^ ---
   }
 }
 
-// _MainPageView 是一個 StatefulWidget
 class _MainPageView extends StatefulWidget {
   const _MainPageView();
 
@@ -36,7 +34,6 @@ class _MainPageView extends StatefulWidget {
   State<_MainPageView> createState() => _MainPageViewState();
 }
 
-// _MainPageViewState 是 _MainPageView 的狀態管理類
 class _MainPageViewState extends State<_MainPageView> {
   int _selectedIndex = 0;
 
@@ -44,7 +41,19 @@ class _MainPageViewState extends State<_MainPageView> {
   final GlobalKey _ordersTabKey = GlobalKey();
   final GlobalKey _notificationKey = GlobalKey();
 
-  static final List<Widget> _widgetOptions = <Widget>[
+  // 這是給「訪客」看的頁面列表
+  static final List<Widget> _guestWidgetOptions = <Widget>[
+    BlocProvider(
+      create: (context) => StoreBloc(),
+      child: const StoreListPage(),
+    ),
+    // 對於需要登入的頁面，我們只放一個簡單的佔位 Widget
+    const Center(child: Text('請先登入以查看訂單')),
+    const Center(child: Text('請先登入以查看個人資料')),
+  ];
+
+  // 這是給「已登入使用者」看的頁面列表
+  static final List<Widget> _loggedInWidgetOptions = <Widget>[
     BlocProvider(
       create: (context) => StoreBloc(),
       child: const StoreListPage(),
@@ -55,6 +64,7 @@ class _MainPageViewState extends State<_MainPageView> {
     ),
     const ProfilePage(),
   ];
+
 
   @override
   void initState() {
@@ -78,6 +88,16 @@ class _MainPageViewState extends State<_MainPageView> {
   }
 
   void _onItemTapped(int index) {
+    // 檢查點擊的是否為需要登入的分頁 (index 1 是訂單, index 2 是我的)
+    if (index == 1 || index == 2) {
+      // 檢查使用者是否已登入
+      if (FirebaseAuth.instance.currentUser == null) {
+        // 如果是訪客，顯示登入提示，並且不切換頁面
+        showLoginPromptDialog(context);
+        return; // 中斷後續的 setState
+      }
+    }
+    // 如果是點擊「店家」(index 0) 或已登入使用者點擊其他分頁，才更新畫面
     setState(() {
       _selectedIndex = index;
     });
@@ -85,6 +105,9 @@ class _MainPageViewState extends State<_MainPageView> {
 
   @override
   Widget build(BuildContext context) {
+    // 判斷當前是否登入
+    final bool isLoggedIn = FirebaseAuth.instance.currentUser != null;
+
     return Scaffold(
       appBar: AppBar(
         title: Text(['選擇店家', '我的訂單', '我的帳戶'][_selectedIndex]),
@@ -117,7 +140,10 @@ class _MainPageViewState extends State<_MainPageView> {
         ],
       ),
       body: Center(
-        child: _widgetOptions.elementAt(_selectedIndex),
+        // 根據登入狀態，選擇要使用的 Widget 列表
+        child: isLoggedIn
+            ? _loggedInWidgetOptions.elementAt(_selectedIndex)
+            : _guestWidgetOptions.elementAt(_selectedIndex),
       ),
       bottomNavigationBar: BottomNavigationBar(
         items: <BottomNavigationBarItem>[
