@@ -103,17 +103,25 @@ class _LoginPageState extends State<LoginPage> {
       );
 
       // 2. 將從 Apple 取得的資訊，傳送到您的後端 API
-      //    後端會負責驗證並建立/登入使用者，然後回傳 Firebase Custom Token
-      final String customToken = await ApiService.signInWithApple(
+      //    後端會負責驗證並建立/登入使用者，然後回傳 Firebase Custom Token 和 isNewUser 狀態
+      final Map<String, dynamic> authData = await ApiService.signInWithApple(
           identityToken: credential.identityToken!,
           fullName: (credential.givenName ?? '') + (credential.familyName ?? ''),
           email: credential.email
       );
 
+      final String customToken = authData['customToken'];
+      final bool isNewUser = authData['isNewUser'];
+
       // 3. 使用後端回傳的 Custom Token 登入 Firebase
       await _auth.signInWithCustomToken(customToken);
 
-      // 4. 執行前端的成功登入流程
+      // 4. 如果是新使用者，在後端為他們建立一個預設的 consumer 身份
+      if (isNewUser) {
+        await ApiService.createUserProfile(role: 'consumer');
+      }
+
+      // 5. 執行前端的成功登入流程
       await _handleSuccessfulLogin();
 
     } catch (e) {

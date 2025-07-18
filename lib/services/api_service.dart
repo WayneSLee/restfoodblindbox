@@ -470,7 +470,7 @@ class ApiService {
     }
   }
 
-  static Future<String> signInWithApple({
+  static Future<Map<String, dynamic>> signInWithApple({
     required String identityToken,
     String? fullName,
     String? email,
@@ -486,13 +486,16 @@ class ApiService {
     );
 
     if (response.statusCode == 200) {
-      // 預期後端會回傳一個 JSON，裡面包含 Firebase Custom Token
+      // 預期後端會回傳一個 JSON，裡面包含 Firebase Custom Token 和 isNewUser
       final responseBody = jsonDecode(response.body);
-      final String? customToken = responseBody['customToken'];
+      final String? customToken = responseBody['firebaseCustomToken'];
       if (customToken != null) {
-        return customToken;
+        return {
+          'customToken': customToken,
+          'isNewUser': responseBody['isNewUser'] ?? false,
+        };
       } else {
-        throw Exception("後端回應中找不到 Custom Token");
+        throw Exception("後端回應中找不到 firebaseCustomToken");
       }
     } else {
       throw Exception('Apple 登入後端驗證失敗: ${response.body}');
