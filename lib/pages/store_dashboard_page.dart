@@ -55,11 +55,13 @@ class _StoreDashboardPageState extends State<StoreDashboardPage> {
     if (confirmLogout == true && context.mounted) {
       await FirebaseAuth.instance.signOut();
       await GoogleSignIn().signOut();
-      // 登出後導航回登入頁面，並清除所有舊頁面
-      Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(builder: (context) => const LoginPage()),
+      // --- vvv 這是本次修改的核心 vvv ---
+      // 將直接導向 LoginPage，改為導向到根路由 '/'
+      Navigator.of(context).pushNamedAndRemoveUntil(
+        '/',
             (Route<dynamic> route) => false,
       );
+      // --- ^^^ 修改到此結束 ^^^ ---
     }
   }
   // --- ^^^ 新增方法到此結束 ^^^ ---

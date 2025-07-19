@@ -111,10 +111,13 @@ class ProfilePage extends StatelessWidget {
       await FirebaseAuth.instance.signOut();
       await GoogleSignIn().signOut();
       if (context.mounted) {
-        Navigator.of(context).pushAndRemoveUntil(
-          MaterialPageRoute(builder: (context) => const LoginPage()),
+        // --- vvv 這是本次修改的核心 vvv ---
+        // 將直接導向 LoginPage，改為導向到根路由 '/'
+        Navigator.of(context).pushNamedAndRemoveUntil(
+          '/',
               (Route<dynamic> route) => false,
         );
+        // --- ^^^ 修改到此結束 ^^^ ---
       }
     }
 
