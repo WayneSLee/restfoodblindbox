@@ -8,6 +8,7 @@ import 'package:restfoodblindbox/pages/login_page.dart';
 import 'package:restfoodblindbox/pages/my_support_tickets_page.dart';
 import 'package:restfoodblindbox/services/theme_notifier.dart';
 import 'package:restfoodblindbox/services/api_service.dart';
+import 'package:restfoodblindbox/pages/about_us_page.dart';
 
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
@@ -225,6 +226,16 @@ class ProfilePage extends StatelessWidget {
           title: const Text('外觀模式'),
           trailing: const Icon(Icons.arrow_forward_ios, size: 16),
           onTap: showThemeDialog,
+        ),
+        ListTile(
+          leading: const Icon(Icons.info_outline),
+          title: const Text('關於我們'),
+          trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+          onTap: () {
+            Navigator.of(context).push(MaterialPageRoute(
+              builder: (_) => const AboutUsPage(),
+            ));
+          },
         ),
         const Divider(),
         ListTile(

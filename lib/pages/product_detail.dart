@@ -156,7 +156,6 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                   }
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: isSoldOut ? Colors.grey : Colors.deepPurple,
                   foregroundColor: Colors.white,
                   minimumSize: const Size(double.infinity, 50),
                   shape: RoundedRectangleBorder(

@@ -2,7 +2,7 @@
     <application
         android:label="食物謎盒"
         android:name="${applicationName}"
-        android:icon="@mipmap/launcher_icon"
+        android:icon="@mipmap/ic_launcher"
         android:extractNativeLibs="false">
         <meta-data android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyBqvF7S3kPbM-F55T1_4ZZso-IE6kbGDpg"/>

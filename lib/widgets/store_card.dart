@@ -66,30 +66,20 @@ class StoreCard extends StatelessWidget {
                   const SizedBox(height: 8),
 
                   // --- vvv 這是本次修改的核心 vvv ---
+                  // 我們讓 Chip 直接使用 ChipTheme 的設定，不再寫死顏色
                   if (store.tags.isNotEmpty)
                     Wrap(
-                      spacing: 4.0, // 縮小水平間距
-                      runSpacing: 2.0, // 縮小垂直間距
+                      spacing: 4.0,
+                      runSpacing: 2.0,
                       children: store.tags
                           .map((tag) => Chip(
                         label: Text(tag),
-                        // 移除固定的文字顏色，讓它自動適應主題
                         labelStyle: const TextStyle(
-                          fontSize: 11, // 縮小字體
+                          fontSize: 11,
                         ),
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 6, vertical: 0), // 縮小內邊距
-                        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap, // 縮小點擊範圍
-                        backgroundColor: Theme.of(context)
-                            .primaryColor
-                            .withOpacity(0.1),
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
-                            side: BorderSide(
-                              color: Theme.of(context)
-                                  .primaryColor
-                                  .withOpacity(0.3),
-                            )),
+                            horizontal: 6, vertical: 0),
+                        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                       ))
                           .toList(),
                     )

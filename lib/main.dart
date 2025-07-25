@@ -46,27 +46,50 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     // --- vvv 定義淺色主題 vvv ---
     final lightTheme = ThemeData(
-      primarySwatch: Colors.orange,
-      brightness: Brightness.light, // 指明這是淺色主題
-      scaffoldBackgroundColor: const Color(0xFFF8F5F2),
+      primarySwatch: Colors.green, // 這裡我們先用一個接近的 MaterialColor
+      primaryColor: const Color(0xFFA7D7C5), // 主色：淡抹茶綠
+      scaffoldBackgroundColor: const Color(0xFFF9F6F2), // 背景：燕麥奶米白
+      brightness: Brightness.light,
+
       appBarTheme: const AppBarTheme(
-        backgroundColor: Colors.orange,
-        foregroundColor: Colors.white,
+        backgroundColor: Color(0xFFA7D7C5), // 導覽列背景：淡抹茶綠
+        foregroundColor: Color(0xFF2E2E2E), // 導覽列文字：深灰
         elevation: 1,
       ),
-      floatingActionButtonTheme: const FloatingActionButtonThemeData(
-        backgroundColor: Colors.orange,
-      ),
+
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.deepPurple,
-          foregroundColor: Colors.white,
+          backgroundColor: const Color(0xFF7F6A93), // 按鈕背景：低彩度紫色
+          foregroundColor: Colors.white, // 按鈕文字：白色
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),
           padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 24),
         ),
       ),
+
+      chipTheme: ChipThemeData(
+        backgroundColor: const Color(0xFFF6C77D).withOpacity(0.2), // 分類標籤：奶油金黃(半透明)
+        labelStyle: const TextStyle(color: Color(0xFF2E2E2E)),
+        shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
+            side: const BorderSide(
+              color: Color(0xFFF6C77D),
+            )),
+      ),
+
+      bottomNavigationBarTheme: BottomNavigationBarThemeData(
+        backgroundColor: Colors.white,
+        selectedItemColor: const Color(0xFFA7D7C5), // 點擊後的圖示顏色：淡抹茶綠
+        unselectedItemColor: Colors.grey[500],
+      ),
+
+      textTheme: const TextTheme(
+        headlineSmall: TextStyle(color: Color(0xFF2E2E2E)), // 標題文字：深灰
+        bodyLarge: TextStyle(color: Color(0xFF2E2E2E)),     // 內文文字：深灰
+        bodyMedium: TextStyle(color: Color(0xFFA0A0A0)),    // 次要文字：淺灰
+      ),
+
       cardTheme: CardThemeData(
         elevation: 2,
         shape: RoundedRectangleBorder(
