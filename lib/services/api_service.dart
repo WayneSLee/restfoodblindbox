@@ -501,4 +501,39 @@ class ApiService {
       throw Exception('Apple 登入後端驗證失敗: ${response.body}');
     }
   }
+
+  static Future<void> updateUserLocation(double latitude, double longitude) async {
+    final token = await _getAuthToken();
+    if (token == null) {
+      // 使用者未登入，不執行任何操作
+      return;
+    }
+
+    try {
+      // 定義一個新的後端端點，例如 /users/me/location
+      final response = await http.put(
+        Uri.parse('$_baseUrl/users/me/location'),
+        headers: {
+          'Content-Type': 'application/json; charset=UTF-8',
+          'Authorization': 'Bearer $token',
+        },
+        body: jsonEncode({
+          'latitude': latitude,
+          'longitude': longitude,
+        }),
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 204) {
+        print('成功透過後端 API 更新使用者位置。');
+      } else {
+        // --- vvv 這是本次修改的核心 vvv ---
+        // 加入更詳細的日誌，包含狀態碼和後端回傳的內文
+        print('更新使用者位置失敗，狀態碼: ${response.statusCode}');
+        print('後端錯誤訊息: ${response.body}');
+        // --- ^^^ 修改到此結束 ^^^ ---
+      }
+    } catch (e) {
+      print("呼叫後端更新位置 API 時發生錯誤: $e");
+    }
+  }
 }

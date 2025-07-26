@@ -2,6 +2,7 @@ import 'package:badges/badges.dart' as badges;
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:provider/provider.dart';
 import 'package:restfoodblindbox/bloc/order/order_bloc.dart';
 import 'package:restfoodblindbox/bloc/order/order_event.dart';
@@ -10,6 +11,7 @@ import 'package:restfoodblindbox/pages/my_orders_page.dart';
 import 'package:restfoodblindbox/pages/notification_list_page.dart';
 import 'package:restfoodblindbox/pages/profile_page.dart';
 import 'package:restfoodblindbox/pages/store_list_page.dart';
+import 'package:restfoodblindbox/services/api_service.dart';
 import 'package:restfoodblindbox/services/fcm_service.dart';
 import 'package:restfoodblindbox/services/notification_service.dart';
 import 'package:restfoodblindbox/widgets/login_prompt_dialog.dart';
@@ -34,7 +36,8 @@ class _MainPageView extends StatefulWidget {
   State<_MainPageView> createState() => _MainPageViewState();
 }
 
-class _MainPageViewState extends State<_MainPageView> {
+// 讓 State 類別混入 (with) WidgetsBindingObserver，使其能夠監聽 App 生命週期
+class _MainPageViewState extends State<_MainPageView> with WidgetsBindingObserver {
   int _selectedIndex = 0;
 
   final GlobalKey _storeTabKey = GlobalKey();
@@ -47,7 +50,6 @@ class _MainPageViewState extends State<_MainPageView> {
       create: (context) => StoreBloc(),
       child: const StoreListPage(),
     ),
-    // 對於需要登入的頁面，我們只放一個簡單的佔位 Widget
     const Center(child: Text('請先登入以查看訂單')),
     const Center(child: Text('請先登入以查看個人資料')),
   ];
@@ -70,7 +72,76 @@ class _MainPageViewState extends State<_MainPageView> {
   void initState() {
     super.initState();
     FcmService().initNotifications();
-    WidgetsBinding.instance.addPostFrameCallback((_) => _checkAndShowGuide());
+
+    // 註冊生命週期監聽器
+    WidgetsBinding.instance.addObserver(this);
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _checkAndShowGuide();
+      // 首次進入 App 時，先更新一次位置
+      _updateUserLocation();
+    });
+  }
+
+  @override
+  void dispose() {
+    // 在頁面銷毀時，移除監聽器，避免記憶體洩漏
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    // 當 App 從背景恢復到前景時
+    if (state == AppLifecycleState.resumed) {
+      print("App has resumed. Updating user location.");
+      // 再次觸發位置更新
+      _updateUserLocation();
+    }
+  }
+
+
+  /// 取得使用者目前位置並更新到後端
+  Future<void> _updateUserLocation() async {
+    // 只在已登入狀態下執行
+    if (FirebaseAuth.instance.currentUser == null) return;
+
+    try {
+      final position = await _determinePosition();
+      if (mounted) {
+        // 呼叫我們在 ApiService 中建立的新方法
+        await ApiService.updateUserLocation(position.latitude, position.longitude);
+      }
+    } catch (e) {
+      // 如果使用者拒絕權限，我們就靜默處理，不打擾使用者
+      print("無法取得使用者位置來更新: $e");
+    }
+  }
+
+  /// 決定使用者的目前位置 (此方法與 StoreBloc/MapBloc 中的完全相同)
+  Future<Position> _determinePosition() async {
+    bool serviceEnabled;
+    LocationPermission permission;
+
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      return Future.error('定位服務已關閉。');
+    }
+
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        return Future.error('定位權限已被拒絕。');
+      }
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+      return Future.error('定位權限已被永久拒絕，我們無法請求權限。');
+    }
+
+    return await Geolocator.getCurrentPosition();
   }
 
   void _checkAndShowGuide() async {
