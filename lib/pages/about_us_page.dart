@@ -129,22 +129,32 @@ class _AboutUsPageState extends State<AboutUsPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              '一個在理髮廳誕生的惜食夢想',
-              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+              '一個源自聚會的惜食夢想',
+              style: Theme
+                  .of(context)
+                  .textTheme
+                  .headlineSmall
+                  ?.copyWith(
                 fontWeight: FontWeight.bold,
               ),
             ),
             const SizedBox(height: 16),
             const Text(
-              '我們的故事，從一張理髮椅開始。\n\n'
-                  '我，冠冠，是一個有點胖的軟體工程師，也是小傑理髮廳超過十年的老顧客。我們總在剪髮時天南地北地聊。一次閒聊中，小傑提到了他在國外旅遊時，看到一款能媒合店家與顧客、解決剩食問題的 App，他覺得這個點子非常有意義。\n\n'
-                  '「你看，這樣既能減少浪費，又能幫助像學生或小資族用更少的錢飽餐一頓，不是很好嗎？」\n\n這句話深深打動了我。從小，我的家訓就是「盤子裡的食物不能剩」，即使遇到討厭的菜，也一定會為了不浪費而吃完。這個想法，與我內心深處的信念不謀而合。\n\n當時的我雖然工作與案子纏身，但這個想法的種子已經埋下。當案子告一段落，我便毅然決然地投入開發。而我的室友，注重健康、白手起家的業務「和和」，因為小時候家境貧困，更能體會食物的珍貴。他聽了這個計畫後，也義不容辭地加入，希望能為社會盡一份心力。\n\n就這樣，一個工程師、一位業務、一位髮型設計師，三個志同道合的朋友，憑著一股熱情，開啟了「食物謎盒」的旅程。',
+              '我們的故事，始於一次朋友間的尋常聚會。\n\n'
+                  '我們是三個背景各異，卻對「珍惜食物」有著同樣執著的朋友。一位成員從小就被教導「盤子裡的食物不能剩」；另一位則因為經歷過困苦的日子，更能體會食物的珍貴；而第三位成員，在國外旅遊時，看見了國外用 App 解決剩食問題的點子。\n\n'
+                  '在一次聚會的閒聊中，這個國外的見聞被提出來，立刻點燃了我們的共鳴。\n\n'
+                  '「你看，這樣既能減少浪費，又能幫助像學生或小資族用更少的錢飽餐一頓，不是很好嗎？」\n\n這句話，讓在場的我們都覺得，這不只是一個好點子，更是一件「值得去做」的事。儘管當時大家各有工作要忙，但這個想法的種子已經悄悄埋下。\n\n'
+                  '當機會來臨時，我們便毅然決然地投入了所有的業餘時間，將這個想法付諸實現。就這樣，憑著一股熱情與共同的信念，我們開啟了「食物謎盒」的旅程。',
               style: TextStyle(fontSize: 16, height: 1.7),
             ),
             const Divider(height: 48),
             Text(
               '支持我們繼續前進',
-              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+              style: Theme
+                  .of(context)
+                  .textTheme
+                  .headlineSmall
+                  ?.copyWith(
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -171,25 +181,26 @@ class _AboutUsPageState extends State<AboutUsPage> {
     }
     if (_products.isEmpty) {
       return const Center(
-        child: Text('目前沒有可用的贊助選項。\n請確認您已在 App Store/Google Play 設定好商品。'),
+        child: Text(
+            '目前沒有可用的贊助選項。\n請確認您已在 App Store/Google Play 設定好商品。'),
       );
     }
 
     return Column(
-    crossAxisAlignment: CrossAxisAlignment.stretch,
-    children: _products.map((product) {
-    return Padding(
-    padding: const EdgeInsets.only(bottom: 12.0),
-    child: ElevatedButton(
-    onPressed: () {
-    final PurchaseParam purchaseParam =
-    PurchaseParam(productDetails: product);
-    _inAppPurchase.buyConsumable(purchaseParam: purchaseParam);
-    },
-    child: Text('贊助 ${product.title} (${product.price})'),
-    ),
-    );
-    }).toList(),
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: _products.map((product) {
+        return Padding(
+          padding: const EdgeInsets.only(bottom: 12.0),
+          child: ElevatedButton(
+            onPressed: () {
+              final PurchaseParam purchaseParam =
+              PurchaseParam(productDetails: product);
+              _inAppPurchase.buyConsumable(purchaseParam: purchaseParam);
+            },
+            child: Text('贊助 ${product.title} (${product.price})'),
+          ),
+        );
+      }).toList(),
     );
   }
 }
