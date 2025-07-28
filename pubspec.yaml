@@ -1,6 +1,6 @@
 name: restfoodblindbox
 description: "RFBB Project"
-version: 1.0.1+11
+version: 1.0.1+12
 
 environment:
   sdk: ^3.8.1

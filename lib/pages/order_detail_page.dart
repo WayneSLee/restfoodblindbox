@@ -7,6 +7,7 @@ import 'package:restfoodblindbox/bloc/store_orders/store_orders_event.dart';
 import 'package:restfoodblindbox/models/order_model.dart';
 import 'package:restfoodblindbox/pages/chat_page.dart';
 import 'package:restfoodblindbox/services/api_service.dart';
+import 'package:url_launcher/url_launcher.dart'; // <--- 1. 引入 url_launcher 套件
 
 final _currencyFormatter =
 NumberFormat.currency(locale: 'zh_TW', symbol: 'NT\$', decimalDigits: 0);
@@ -28,6 +29,26 @@ class OrderDetailPage extends StatefulWidget {
 
 class _OrderDetailPageState extends State<OrderDetailPage> {
   bool _isProcessing = false;
+
+  // --- vvv 2. 新增啟動地圖導航的方法 vvv ---
+  Future<void> _launchMaps(BuildContext context, String address) async {
+    // 將地址進行 URL 編碼，以處理特殊字元
+    final encodedAddress = Uri.encodeComponent(address);
+    // 建立一個通用的 Google Maps 搜尋 URL
+    final googleMapsUrl = Uri.parse('https://www.google.com/maps/search/?api=1&query=$encodedAddress');
+
+    if (await canLaunchUrl(googleMapsUrl)) {
+      // 嘗試啟動 URL
+      await launchUrl(googleMapsUrl, mode: LaunchMode.externalApplication);
+    } else {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('無法開啟地圖應用程式')),
+        );
+      }
+    }
+  }
+  // --- ^^^ 新增結束 ^^^ ---
 
   Future<void> _updateOrderStatus(Future<void> Function(String) apiCall) async {
     if (_isProcessing) return;
@@ -126,7 +147,6 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
             ),
             const SizedBox(height: 24),
 
-            // --- vvv 這是本次修改的核心 vvv ---
             if (isConsumer)
               _buildContactButton(
                 context,
@@ -135,7 +155,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                   builder: (context) => ChatPage(
                     orderId: widget.order.id,
                     recipientName: widget.order.storeName,
-                    chatContext: 'order', // 明確指定這是訂單聊天
+                    chatContext: 'order',
                   ),
                 )),
               ),
@@ -148,11 +168,26 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                   builder: (context) => ChatPage(
                     orderId: widget.order.id,
                     recipientName: widget.order.customerProfile?.name ?? '顧客',
-                    chatContext: 'order', // 明確指定這是訂單聊天
+                    chatContext: 'order',
                   ),
                 )),
               ),
-            // --- ^^^ 修改到此結束 ^^^ ---
+
+            // --- vvv 3. 新增導航按鈕的 UI 邏輯 vvv ---
+            const SizedBox(height: 8),
+            if (isConsumer && widget.order.status.toLowerCase() == 'accepted')
+              ElevatedButton.icon(
+                icon: const Icon(Icons.directions),
+                label: const Text('導航至店家'),
+                onPressed: () => _launchMaps(context, widget.order.storeAddress),
+                style: ElevatedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  backgroundColor: Colors.blue.shade700,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                ),
+              ),
+            // --- ^^^ 新增結束 ^^^ ---
 
             const SizedBox(height: 16),
 

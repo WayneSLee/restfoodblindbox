@@ -210,11 +210,13 @@ class _MainPageViewState extends State<_MainPageView> with WidgetsBindingObserve
           ),
         ],
       ),
-      body: Center(
-        // 根據登入狀態，選擇要使用的 Widget 列表
-        child: isLoggedIn
-            ? _loggedInWidgetOptions.elementAt(_selectedIndex)
-            : _guestWidgetOptions.elementAt(_selectedIndex),
+      body: SafeArea(
+        child: Center(
+          // 根據登入狀態，選擇要使用的 Widget 列表
+          child: isLoggedIn
+              ? _loggedInWidgetOptions.elementAt(_selectedIndex)
+              : _guestWidgetOptions.elementAt(_selectedIndex),
+        ),
       ),
       bottomNavigationBar: BottomNavigationBar(
         items: <BottomNavigationBarItem>[
